@@ -37,10 +37,18 @@ jobs:
         with:
           go-version: '1.27.1'
 
-      - name: Install semrel and GitHub provider
+      - name: Install semrel
+        run: go install github.com/SemRels/semrel/cmd/semrel@v0.26.2
+
+      - name: Restore pinned Semrel provider
+        run: semrel plugin restore
+
+      # This config applies only to the disposable Actions checkout. Semrel
+      # writes a tag and GitHub Release, never a version or changelog commit.
+      - name: Configure Git identity
         run: |
-          go install github.com/SemRels/semrel/cmd/semrel@v0.26.2
-          semrel plugin install @semrel/provider-github@0.5.3
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
       - name: Validate semrel configuration
         run: semrel config validate
@@ -49,4 +57,4 @@ jobs:
         id: semrel
         run: semrel release --github-output
         env:
-          SEMREL_PLUGIN_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SEMREL_PLUGIN_TOKEN: ${{ github.token }}

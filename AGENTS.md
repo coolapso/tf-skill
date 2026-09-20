@@ -81,7 +81,13 @@ No automated behavioral suite. For a behavior-affecting change:
 
 ## Commit Conventions & Releases
 
-Releases are **fully automated** by semrel from conventional commits on `master`:
+Releases are **fully automated** by semrel from conventional commits on `master`.
+The release checkout may create a Git tag and GitHub Release, but it must never
+commit generated versions, changelogs, or release files back to `master`:
+
+- Keep the provider declaration unversioned in `.semrel.yaml`; pin its exact
+  version and checksums in the committed `.semrel.lock`.
+- Restore that provider at release build time with `semrel plugin restore`.
 
 | Commit prefix | Version bump |
 |---------------|-------------|

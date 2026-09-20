@@ -24,8 +24,6 @@ rules:
 # Git tags and GitHub Releases are the release record. Do not write generated
 # changelog or version files into the repository.
 commit_changelog: false
-tag_exists_strategy: error
-
 plugins:
-  - uses: "@semrel/provider-github@0.5.3"
+  - uses: "@semrel/provider-github"
     phase: release
