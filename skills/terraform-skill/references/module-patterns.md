@@ -5,6 +5,8 @@
 
 This document provides detailed guidance on creating reusable, maintainable Terraform modules. For high-level principles, see the [main skill file](../SKILL.md#core-principles).
 
+> **Local fork override:** The [main skill's fork invariants](../SKILL.md#local-fork-invariants) take precedence over inherited hierarchy examples below. Keep reusable modules as leaves and put direct module wiring in the root composition; do not introduce child-module hierarchies without a concrete, documented exception.
+
 ---
 
 ## Table of Contents

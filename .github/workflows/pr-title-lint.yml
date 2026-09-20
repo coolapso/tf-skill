@@ -4,9 +4,8 @@ name: Lint PR Title
 #
 # Why the title (not the commits): PRs are squash-merged and the repo's
 # `squash_merge_commit_title` is `PR_TITLE`, so the PR title becomes the commit
-# subject on master. That subject is what `automated-release.yml`
-# (TriPSs/conventional-changelog-action, angular preset) reads to decide the
-# version bump, changelog group, and whether a release is cut. A
+# subject on master. That subject is what semrel reads to decide the version
+# bump and whether a release is cut. A
 # non-conventional title => no release / wrong bump.
 #
 # This is a required status check on master (ruleset). It must run on EVERY PR,
@@ -41,8 +40,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          # Angular preset types - must match the changelog action so a title
-          # that lints here also produces the intended release behavior.
+          # Types must align with semrel's configured release rules.
           # Breaking changes (`feat!:`, `fix!:`) are handled natively.
           types: |
             feat

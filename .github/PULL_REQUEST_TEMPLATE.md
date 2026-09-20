@@ -137,10 +137,10 @@ Relates to #
 - [ ] Token efficiency maintained
 - [ ] Quality standards met
 - [ ] No conflicts with existing content
-- [ ] CHANGELOG.md and version are CI-managed from conventional commits (do not edit manually)
+- [ ] No generated release files were added; semrel owns tags and GitHub Releases
 
 ### Merge Checklist
 
-- [ ] PR **title** is a valid Conventional Commits subject (enforced by the "Validate PR Title" check) - it becomes the squash commit subject that drives the release
+- [ ] PR **title** and every PR commit are valid Conventional Commits subjects (enforced by "Validate PR Title" and `convcommitlint`) - the squash title becomes the commit that drives the release
 - [ ] Squash-merge only (direct pushes to master are blocked; the squash subject = the PR title)
-- [ ] Release (CHANGELOG, version bump, tag) is automated from conventional commits on master - no manual step
+- [ ] Release tag and GitHub Release are automated from conventional commits on master

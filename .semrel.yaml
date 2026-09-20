@@ -1,0 +1,31 @@
+# yaml-language-server: $schema=https://registry.semrel.io/schemas/core/v1.json
+schemaVersion: 1
+tagPrefix: v
+
+branches:
+  - name: master
+
+rules:
+  - type: feat
+    bump: minor
+  - type: fix
+    bump: patch
+  - type: perf
+    bump: patch
+  - type: revert
+    bump: patch
+  - type: docs
+    bump: patch
+  - type: test
+    bump: patch
+  - type: refactor
+    bump: patch
+
+# Git tags and GitHub Releases are the release record. Do not write generated
+# changelog or version files into the repository.
+commit_changelog: false
+tag_exists_strategy: error
+
+plugins:
+  - uses: "@semrel/provider-github@0.5.3"
+    phase: release

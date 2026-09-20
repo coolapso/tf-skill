@@ -26,7 +26,7 @@ Thanks for helping improve terraform-skill. Guidelines for contributors below.
 - ❌ Personal preferences without community consensus
 - ❌ Provider-specific resource details (use Terraform MCP tools instead)
 - ❌ Untested changes (see TDD requirement below)
-- ❌ Content that duplicates existing Claude knowledge
+- ❌ Content that duplicates existing agent knowledge
 
 ## Content Standards
 
@@ -43,7 +43,7 @@ SKILL.md frontmatter must include two required fields. Other fields are optional
 
 - `license` — e.g. `Apache-2.0`
 - `metadata.author` — attribution
-- `metadata.version` — **auto-synced by the release workflow; never hand-edit**
+- `metadata.version` — static skill metadata; release tags are managed by semrel
 - Future additions the validate workflow accepts
 
 Current frontmatter:
@@ -102,7 +102,7 @@ The description must focus on WHEN to use (triggers, symptoms), not WHAT the ski
 
 ### LLM Consumption Rules
 
-Every SKILL.md or `references/*.md` addition must follow the rules in [CLAUDE.md §LLM Consumption Rules](CLAUDE.md#llm-consumption-rules-enforce-in-every-pr-review):
+Every SKILL.md or `references/*.md` addition must follow the rules in [AGENTS.md §LLM Consumption Rules](AGENTS.md#llm-consumption-rules-enforce-in-every-pr-review):
 
 - Decision table before playbook
 - No before/after diffs that restate the phase steps
@@ -118,7 +118,7 @@ Reviewers reject PRs that violate these.
 ```text
 terraform-skill/
 ├── skills/
-│   └── terraform-skill/            # Autodiscovered by Claude Code plugin system
+│   └── terraform-skill/            # Core skill for compatible agent hosts
 │       ├── SKILL.md                # Core skill (~305 lines)
 │       └── references/             # Reference files (progressive disclosure)
 │           ├── ci-cd-workflows.md
@@ -134,7 +134,7 @@ terraform-skill/
 │   ├── compliance-verification.md
 │   └── rationalization-table.md
 └── .github/workflows/              # Automation
-    ├── automated-release.yml
+    ├── tag-release.yml
     └── validate.yml
 ```
 
@@ -169,7 +169,7 @@ Example: adding security scanning guidance → affects Scenario 3.
 
 ```bash
 # Disable skill temporarily
-/plugin disable terraform-skill@antonbabenko
+mv ~/.claude/skills/terraform-skill ~/.claude/skills/terraform-skill.disabled
 
 # Run affected scenario
 # Document agent response in tests/baseline-results/
@@ -183,7 +183,7 @@ Edit SKILL.md or reference files.
 
 ```bash
 # Re-enable skill
-/plugin enable terraform-skill@antonbabenko
+mv ~/.claude/skills/terraform-skill.disabled ~/.claude/skills/terraform-skill
 
 # Run same scenario
 # Document improved behavior in tests/compliance-results/
@@ -277,7 +277,7 @@ Include WHEN information:
 
 ## Commit Message Format
 
-This project uses [Conventional Commits](https://www.conventionalcommits.org/) to automate releases and changelog generation.
+This project uses [Conventional Commits](https://www.conventionalcommits.org/) for semrel release tags and GitHub Releases.
 
 ### Format
 
@@ -297,7 +297,7 @@ This project uses [Conventional Commits](https://www.conventionalcommits.org/) t
 | `feat:` | Minor (1.2.x → 1.3.0) | New features |
 | `fix:` | Patch (1.2.3 → 1.2.4) | Bug fixes |
 | `docs:` | Patch | Documentation only |
-| `chore:` | Patch | Maintenance, tooling |
+| `chore:` | No release | Maintenance, tooling |
 | `test:` | Patch | Test improvements |
 | `refactor:` | Patch | Code refactoring |
 
@@ -327,19 +327,20 @@ git commit -m "docs: improve testing strategy documentation"
 git commit -m "chore: update workflow dependencies"
 ```
 
-Commit type determines the version bump, the changelog group, and whether a release is cut on merge to master. The release workflow updates the version in SKILL.md frontmatter (the single version source) and tags the release.
+Commit type determines the version bump and whether a release is cut on merge to master. Semrel releases `feat` (minor) and `fix`, `perf`, `revert`, `docs`, `test`, or `refactor` (patch); `chore`, `build`, `ci`, and `style` do not cut a release. Git tags and GitHub Releases are the release record.
 
-### The PR title is what counts
+### PR titles and commits are both checked
 
 PRs are **squash-merged**, and the squash commit subject is the **PR title**. That title is the subject the release workflow reads on master - so the **PR title must be a valid Conventional Commits subject** (e.g. `feat: add native test mocking guidance`), not just your individual commits.
 
 - ✅ Title the PR with a conventional `type: description` (use `feat!:` or a `BREAKING CHANGE:` footer for breaking changes).
 - A required CI check, **"Validate PR Title"**, lints the title on every PR and blocks merge until it conforms.
-- Your in-progress commit messages are squashed away, so they need not be conventional - only the PR title.
+- A required CI check, **"Validate Skill Files"**, runs `convcommitlint` over every commit in the PR. Make every commit conventional too.
+- The release workflow runs that same validation after merge, before Semrel can create a tag or GitHub Release.
 
 ### No direct pushes to master
 
-`master` is protected: **all changes land through a pull request** (direct pushes are rejected). Releases also go through an automated PR - see the Release Process below.
+`master` is protected: **all changes land through a pull request** (direct pushes are rejected).
 
 ## Submitting Changes
 
@@ -386,15 +387,10 @@ PRs are reviewed for:
 
 ## Release Process
 
-Releases are automated from conventional commits:
-
-1. PR merged to `master`
-2. Workflow analyzes commits since the last release
-3. Workflow calculates the version bump (major/minor/patch)
-4. Workflow updates:
-   - `skills/terraform-skill/SKILL.md` frontmatter (`metadata.version`)
-   - `CHANGELOG.md` (generated from commits)
-5. Workflow creates the git tag and GitHub Release
+Releases are automated by semrel from conventional commits. With no existing
+tags, its first release creates this fork's independent `v1.0.0`; each later
+releasable PR merged to `master` is evaluated, tagged, and published as a
+GitHub Release.
 
 Contributors don't manage versions — conventional commits in your PRs are enough.
 
@@ -402,15 +398,15 @@ See the [Releases section in README.md](README.md#releases) for details.
 
 ## Questions?
 
-- **Issues:** [GitHub Issues](https://github.com/antonbabenko/terraform-skill/issues)
-- **Discussions:** [GitHub Discussions](https://github.com/antonbabenko/terraform-skill/discussions)
-- **Author:** [@antonbabenko](https://github.com/antonbabenko)
+- **Issues:** [GitHub Issues](https://github.com/coolapso/tf-skill/issues)
+- **Discussions:** [GitHub Discussions](https://github.com/coolapso/tf-skill/discussions)
+- **Maintainer:** [@coolapso](https://github.com/coolapso)
 
 ## Additional Resources
 
 **For contributors:**
 
-- [CLAUDE.md](CLAUDE.md) — development guidelines, architecture, and LLM Consumption Rules
+- [AGENTS.md](AGENTS.md) — development guidelines, architecture, and LLM Consumption Rules
 - [tests/baseline-scenarios.md](tests/baseline-scenarios.md) — testing scenarios
 
 **Skill standards:**

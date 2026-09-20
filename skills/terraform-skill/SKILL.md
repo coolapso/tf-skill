@@ -4,12 +4,24 @@ description: Use when writing, reviewing, or debugging Terraform/OpenTofu module
 license: Apache-2.0
 metadata:
   author: Anton Babenko
-  version: 1.17.1
+  version: 1.0.0
 ---
 
-# Terraform Skill for Claude
+# OpenTofu & Terraform Skill
 
 Diagnose-first guidance for Terraform and OpenTofu. Core file is a workflow; depth lives in references loaded on demand.
+
+## Local Fork Invariants
+
+These rules override conflicting inherited guidance in this skill and its references:
+
+- **Flat module composition:** reusable modules are leaf modules. Do not create child-module hierarchies unless a concrete, documented benefit outweighs their troubleshooting cost.
+- **`for_each` by default:** use stable, meaningful keys for one or many instances. Reserve `count` for a boolean creation gate, not replication or long-lived identity.
+- **OpenTofu first, dual-runtime support:** when no runtime is specified, prefer `tofu` commands and OpenTofu examples. Keep configurations compatible with Terraform where language features overlap, name version or feature differences explicitly, and respect an explicit Terraform request.
+- **CLI workspaces:** discourage Terraform CLI workspaces for environment isolation; use separate root configurations and backend state instead.
+
+When asked to update, sync, or reconcile this fork with upstream, read the
+repository-root `FORK.md` before comparing files or proposing changes.
 
 ## Response Contract
 
@@ -57,19 +69,18 @@ Never run `terraform destroy` (targeted or full) without first running `terrafor
 
 **Activate when:** creating or reviewing Terraform/OpenTofu configurations or modules, setting up or debugging tests, structuring multi-environment deployments, implementing IaC CI/CD, choosing module patterns or state organization, configuring or migrating remote state backends.
 
-**Don't use for:** basic HCL syntax questions Claude already knows, provider API reference (link to docs), cloud-platform questions unrelated to Terraform/OpenTofu.
+**Don't use for:** basic HCL syntax questions the agent already knows, provider API reference (link to docs), cloud-platform questions unrelated to Terraform/OpenTofu.
 
 ## Core Principles
 
-### Module Hierarchy
+### Module Topology
 
 | Type | When to Use | Scope |
 |------|-------------|-------|
-| **Resource module** | Single logical group of connected resources | VPC + subnets, SG + rules |
-| **Infrastructure module** | Collection of resource modules for a purpose | Multiple resource modules in one region/account |
-| **Composition** | Complete infrastructure | Spans multiple regions/accounts |
+| **Leaf module** | Single logical group of connected resources | VPC + subnets, SG + rules |
+| **Root composition** | Complete infrastructure and direct module wiring | Spans components, regions, or accounts |
 
-Flow: resource → resource module → infrastructure module → composition.
+Flow: root composition → leaf modules → resources. Keep module calls at the root. A child-module exception requires a concrete benefit and an explanation of why a flat composition is insufficient.
 
 ### Directory Layout
 
@@ -128,12 +139,11 @@ See [Testing Frameworks](references/testing-frameworks.md) for static-analysis p
 
 | Scenario | Use | Why |
 |----------|-----|-----|
-| Boolean condition (create / don't) | `count = condition ? 1 : 0` | Optional singleton toggle |
-| Items may be reordered or removed | `for_each = toset(list)` | Stable resource addresses |
-| Reference by key | `for_each = map` | Named access |
-| Multiple named resources | `for_each` | Better identity stability |
+| Boolean creation gate | `count = condition ? 1 : 0` | Explicit 0/1 gate |
+| Singleton with stable identity | `for_each = { primary = value }` | Consistent keyed address |
+| One or many named resources | `for_each = map` | Stable, meaningful identity |
 
-**Never** use list index as long-lived identity — removing a middle element reshuffles every address after it. For the decision matrix, safe migration playbook, `moved` block patterns, and known-at-plan failure cases, see [Code Patterns: count vs for_each](references/code-patterns.md#count-vs-for_each-deep-dive).
+**Never** use a list index as long-lived identity. Prefer `for_each` even for a single resource when it is not a boolean gate. For the migration playbook and known-at-plan failure cases, see [Code Patterns: count vs for_each](references/code-patterns.md#count-vs-for_each-deep-dive).
 
 ## Locals for Dependency Management
 
@@ -270,7 +280,10 @@ Before emitting a feature, verify the runtime floor. See [Code Patterns: Feature
 
 Semantic navigation for HCL. terraform-ls is optional; without it every row below degrades to a disclosed `rg` + Read fallback.
 
-Self-contained terraform-ls layer of a generic code-intelligence discipline - apply the rows below directly. Recommended companion: the `code-intelligence` plugin (same `antonbabenko/agent-plugins` marketplace) carries the generic discipline (position anchoring, degradation gate, disclosure format, anti-phantom-shim) and ships `/code-intelligence:doctor` for readiness. If it is installed, defer to its generic protocol; this skill stays fully self-contained without it.
+Self-contained terraform-ls layer of a generic code-intelligence discipline -
+apply the rows below directly. If the host provides a compatible general
+code-intelligence workflow, defer to its generic protocol; this skill stays
+fully self-contained without it.
 
 | Goal | Use | Tradeoff |
 |------|-----|----------|

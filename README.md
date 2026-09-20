@@ -1,4 +1,4 @@
-# Terraform & OpenTofu Skill for AI Agents
+# OpenTofu & Terraform Skill for AI Agents
 
 [![Agent Skill](https://img.shields.io/badge/Agent-Skill-5865F2)](https://agentskills.io)
 [![Terraform](https://img.shields.io/badge/Terraform-1.0+-623CE4)](https://www.terraform.io/)
@@ -8,6 +8,23 @@
 A best-practices skill for Terraform and OpenTofu, for AI coding agents (Claude Code, Cursor, Copilot, Gemini CLI, OpenCode, Codex, Kiro, and more). It helps the agent test code, structure modules, set up CI/CD, and write production infrastructure code.
 
 AWS, Azure, and GCP are all first-class. AWS stays the default in examples, but the same backend, auth, security, and resource guidance applies to all three - ask for the Azure or GCP equivalent of any pattern and the skill maps it.
+
+## Local fork
+
+This is an independent fork of `terraform-skill`, based on upstream version 1.17.1.
+
+Its three deliberate policy differences are:
+
+- **Flat module composition.** Reusable modules should be leaf modules containing resources and data sources; do not create child-module hierarchies unless a concrete, documented benefit outweighs the troubleshooting cost.
+- **`for_each` by default.** Use stable keys for both one and many resource instances. Reserve `count` for boolean creation gates, not replication or long-lived identity.
+- **OpenTofu first, dual-runtime support.** Prefer OpenTofu in new examples and commands when no runtime is specified, while retaining Terraform compatibility and naming version or feature differences explicitly.
+
+### Thank you
+
+Thank you to [Anton Babenko](https://github.com/antonbabenko) for creating the
+original skill and making this independent fork possible.
+
+For the upstream baseline, the protected fork invariants, and the agent workflow for reviewing an upstream update, see [FORK.md](FORK.md).
 
 ## What this skill provides
 
@@ -45,20 +62,11 @@ AWS, Azure, and GCP are all first-class. AWS stays the default in examples, but 
 
 ## Installation
 
-Installed through one Claude Code marketplace, `antonbabenko/agent-plugins`
-(terraform-skill is listed there as an external plugin). Do not also add
-`antonbabenko/terraform-skill` as a marketplace - both use the same marketplace
-name and will clash.
+This is a plain Agent Skill. Clone or copy `skills/terraform-skill/` into the
+directory your agent discovers; no package manager, plugin marketplace, or
+generated package metadata is required.
 
-### Quick install (any agent)
-
-Works with any [Agent Skills](https://agentskills.io)-compatible tool:
-
-```bash
-npx skills add https://github.com/antonbabenko/terraform-skill
-```
-
-### Per-host instructions
+### Per-host installation
 
 <!-- prettier-ignore-start -->
 
@@ -66,9 +74,13 @@ npx skills add https://github.com/antonbabenko/terraform-skill
 <summary>Claude Code</summary>
 
 ```bash
-/plugin marketplace add antonbabenko/agent-plugins
-/plugin install terraform-skill@antonbabenko
+git clone https://github.com/coolapso/tf-skill.git ~/.local/share/tf-skill
+mkdir -p ~/.claude/skills
+ln -s ~/.local/share/tf-skill/skills/terraform-skill ~/.claude/skills/terraform-skill
 ```
+
+Claude Code discovers global skills in `~/.claude/skills/`. Update the clone
+with `git -C ~/.local/share/tf-skill pull`.
 
 </details>
 
@@ -76,7 +88,7 @@ npx skills add https://github.com/antonbabenko/terraform-skill
 <summary>Gemini CLI</summary>
 
 ```bash
-gemini extensions install https://github.com/antonbabenko/terraform-skill
+gemini extensions install https://github.com/coolapso/tf-skill
 ```
 
 Update with `gemini extensions update terraform-skill`.
@@ -87,7 +99,7 @@ Update with `gemini extensions update terraform-skill`.
 <summary>Cursor</summary>
 
 ```bash
-git clone https://github.com/antonbabenko/terraform-skill.git ~/.cursor/skills/terraform-skill
+git clone https://github.com/coolapso/tf-skill.git ~/.cursor/skills/terraform-skill
 ```
 
 Cursor auto-discovers skills from `.agents/skills/` and `.cursor/skills/`.
@@ -98,9 +110,7 @@ Cursor auto-discovers skills from `.agents/skills/` and `.cursor/skills/`.
 <summary>Copilot</summary>
 
 ```bash
-/plugin install https://github.com/antonbabenko/terraform-skill
-# or
-git clone https://github.com/antonbabenko/terraform-skill.git ~/.copilot/skills/terraform-skill
+git clone https://github.com/coolapso/tf-skill.git ~/.copilot/skills/terraform-skill
 ```
 
 Copilot auto-discovers skills from `.copilot/skills/`.
@@ -111,7 +121,7 @@ Copilot auto-discovers skills from `.copilot/skills/`.
 <summary>OpenCode</summary>
 
 ```bash
-git clone https://github.com/antonbabenko/terraform-skill.git ~/.agents/skills/terraform-skill
+git clone https://github.com/coolapso/tf-skill.git ~/.agents/skills/terraform-skill
 ```
 
 OpenCode auto-discovers skills from `.agents/skills/`, `.opencode/skills/`, and `.claude/skills/`.
@@ -122,15 +132,11 @@ OpenCode auto-discovers skills from `.agents/skills/`, `.opencode/skills/`, and 
 <summary>Codex (OpenAI)</summary>
 
 ```bash
-git clone https://github.com/antonbabenko/terraform-skill.git ~/.agents/skills/terraform-skill
+git clone https://github.com/coolapso/tf-skill.git ~/.agents/skills/terraform-skill
 ```
 
-Codex auto-discovers skills from `~/.agents/skills/` and `.agents/skills/`. Update with `cd ~/.agents/skills/terraform-skill && git pull`.
-
-For a managed Codex plugin install, use the `antonbabenko/agent-plugins`
-marketplace (`codex plugin marketplace add antonbabenko/agent-plugins`, then
-install `terraform-skill`). Do not add `antonbabenko/terraform-skill` as a
-separate marketplace - it clashes by name with `agent-plugins`.
+Codex auto-discovers skills from `~/.agents/skills/` and `.agents/skills/`.
+Update with `cd ~/.agents/skills/terraform-skill && git pull`.
 
 </details>
 
@@ -140,7 +146,7 @@ separate marketplace - it clashes by name with `agent-plugins`.
 Install the skill globally:
 
 ```bash
-git clone https://github.com/antonbabenko/terraform-skill.git
+git clone https://github.com/coolapso/tf-skill.git
 mkdir -p ~/.autohand/skills
 cp -R terraform-skill/skills/terraform-skill ~/.autohand/skills/
 ```
@@ -148,7 +154,7 @@ cp -R terraform-skill/skills/terraform-skill ~/.autohand/skills/
 Or install it only for the current project:
 
 ```bash
-git clone https://github.com/antonbabenko/terraform-skill.git
+git clone https://github.com/coolapso/tf-skill.git
 mkdir -p .autohand/skills
 cp -R terraform-skill/skills/terraform-skill .autohand/skills/
 ```
@@ -161,7 +167,7 @@ Autohand Code discovers skills from `~/.autohand/skills/` and `.autohand/skills/
 <summary>Kiro</summary>
 
 ```bash
-git clone https://github.com/antonbabenko/terraform-skill.git ~/.kiro/skills/terraform-skill
+git clone https://github.com/coolapso/tf-skill.git ~/.kiro/skills/terraform-skill
 ```
 
 Kiro auto-discovers skills from `.kiro/skills/` (workspace) and `~/.kiro/skills/` (global).
@@ -172,44 +178,11 @@ Kiro auto-discovers skills from `.kiro/skills/` (workspace) and `~/.kiro/skills/
 <summary>Antigravity/Antigravity IDE/Antigravity CLI</summary>
 
 ```bash
-git clone https://github.com/antonbabenko/terraform-skill.git
+git clone https://github.com/coolapso/tf-skill.git
 ln -s "$(pwd)/terraform-skill/skills/terraform-skill" ~/.gemini/config/skills/terraform-skill
 ```
 
 Update with `git pull`.
-
-</details>
-
-<details>
-<summary>Kiro</summary>
-
-This repo is also a [Kiro Power](https://kiro.dev/docs/powers/) (root
-`POWER.md` + optional `mcp.json`). In Kiro: **Powers panel → "Add power from
-GitHub"**, then paste:
-
-```text
-https://github.com/antonbabenko/terraform-skill
-```
-
-Kiro activates the power on keyword match (e.g. "terraform", "opentofu",
-"state", "modules"). Installing it also registers the optional read-only
-HashiCorp `terraform-mcp-server` (from `mcp.json`) under the Powers section of
-`~/.kiro/settings/mcp.json` — the guidance works without it. `POWER.md` is
-generated from `skills/terraform-skill/SKILL.md`; the skill content is shared,
-not duplicated.
-
-</details>
-
-<details>
-<summary>Manual (symlink local clone)</summary>
-
-```bash
-git clone https://github.com/antonbabenko/terraform-skill
-mkdir -p ~/.claude/plugins
-ln -s "$(pwd)/terraform-skill" ~/.claude/plugins/terraform-skill
-```
-
-Claude Code autodiscovers the skill at `skills/terraform-skill/SKILL.md` on next launch. Edits to the clone are picked up live.
 
 </details>
 
@@ -222,34 +195,7 @@ After installation, try:
 "Create a Terraform module with testing for an S3 bucket"
 ```
 
-Claude picks up the skill automatically when working with Terraform or OpenTofu code.
-
-## Recommended companion: code-intelligence
-
-Install the `code-intelligence` plugin alongside this one:
-
-```bash
-/plugin marketplace add antonbabenko/agent-plugins
-/plugin install code-intelligence@antonbabenko
-```
-
-It holds the general, any-language rules for navigating code (when to use a
-language server, plain text search, or fuzzy search; how to anchor a lookup to
-a position; what to do when a tool fails; saying so when one tool is swapped
-for another). terraform-skill is the Terraform-specific version of those rules.
-Why install it:
-
-- **Fewer tokens** - the rules live in one place. The agent loads them when
-  needed instead of repeating them in every language skill.
-- **More accurate** - it finds definitions and references by meaning, not by
-  plain text matching, so renames and refactors do not miss spots or change
-  the wrong ones.
-- **Faster** - it picks the right tool the first time instead of retrying,
-  and says up front when it had to use a different one.
-
-terraform-skill works on its own without it. The name `code-intelligence` is
-not unique; if a `code-intelligence` skill is active, check it is the one from
-[antonbabenko/agent-plugins](https://github.com/antonbabenko/agent-plugins).
+Your agent picks up the skill automatically when working with Terraform or OpenTofu code.
 
 ## Quick start examples
 
@@ -374,9 +320,17 @@ How the skill uses it:
 
 ## Contributing
 
-See [CLAUDE.md](CLAUDE.md) for skill development guidelines, content structure, how to propose improvements, and the validation approach.
+See [AGENTS.md](AGENTS.md) for skill development guidelines, content structure, how to propose improvements, and the validation approach.
 
-Report bugs or request features via [GitHub Issues](https://github.com/antonbabenko/terraform-skill/issues).
+Report bugs or request features via [GitHub Issues](https://github.com/coolapso/tf-skill/issues).
+
+## Support
+
+If you like this project and want to support / contribute in a different way you can always [:heart: Sponsor Me](https://github.com/sponsors/coolapso) or
+
+<a href="https://www.buymeacoffee.com/coolapso" target="_blank">
+  <img src="https://cdn.buymeacoffee.com/buttons/default-yellow.png" alt="Buy Me A Coffee" style="height: 51px !important;width: 217px !important;" />
+</a>
 
 ## Related resources
 
