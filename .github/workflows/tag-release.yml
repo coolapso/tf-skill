@@ -4,6 +4,7 @@ name: Semrel Release
 # bump, creates the tag, and publishes the GitHub Release from master.
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - master
