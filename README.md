@@ -9,9 +9,9 @@ A best-practices skill for Terraform and OpenTofu, for AI coding agents (Claude 
 
 AWS, Azure, and GCP are all first-class. AWS stays the default in examples, but the same backend, auth, security, and resource guidance applies to all three - ask for the Azure or GCP equivalent of any pattern and the skill maps it.
 
-## Local fork
+## Fork policy
 
-This is an independent fork of `terraform-skill`, based on upstream version 1.17.1.
+This is an independent fork of [antonbabenko/terraform-skill](https://github.com/antonbabenko/terraform-skill), based on upstream version 1.17.1.
 
 Its three deliberate policy differences are:
 
