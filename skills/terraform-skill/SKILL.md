@@ -163,8 +163,8 @@ my-module/
 ├── outputs.tf      # Output values
 ├── versions.tf     # required_version + required_providers
 ├── examples/
-│   ├── minimal/
-│   └── complete/
+│   ├── tofu/       # minimal/ complete OpenTofu usage
+│   └── terragrunt/ # Terragrunt usage
 └── tests/
     └── module_test.tftest.hcl   # or Go for Terratest
 ```
@@ -172,6 +172,8 @@ my-module/
 **Variable contracts**: always `description`, always explicit `type`, use `validation` for complex constraints, use `sensitive = true` for secrets, prefer `optional()` with typed defaults (1.3+) over untyped `map(any)`.
 
 **Output contracts**: always `description`, mark sensitive outputs, expose stable subsets (not whole provider objects).
+
+Keep runnable OpenTofu and Terragrunt usage examples in `examples/`; update both when the module's inputs, outputs, source, or runtime requirements change.
 
 See [Module Patterns](references/module-patterns.md) for the full contract patterns, module release checklist, and LLM-mistake checklist.
 

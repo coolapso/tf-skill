@@ -368,8 +368,8 @@ my-module/
 ├── outputs.tf               # Output values
 ├── versions.tf              # Provider version constraints
 ├── examples/
-│   ├── simple/              # Minimal working example
-│   └── complete/            # Full-featured example
+│   ├── tofu/                # Minimal and complete OpenTofu usage
+│   └── terragrunt/          # Terragrunt usage
 └── tests/                   # Test files
     └── module_test.tftest.hcl  # Or .go
 ```
@@ -383,7 +383,7 @@ my-module/
 - `variables.tf` — all inputs, with descriptions
 - `outputs.tf` — all outputs, with descriptions
 - `versions.tf` — pinned provider versions
-- `examples/` — docs + test fixtures
+- `examples/` — runnable OpenTofu and Terragrunt usage docs + test fixtures; update both when the module contract changes
 - `tests/` — automated tests
 
 ### License Files
@@ -740,7 +740,7 @@ Before publishing or handing off a reusable module:
 
 - [ ] Runtime and provider choice explicit (Terraform vs OpenTofu, version floor in `required_version`)
 - [ ] Public vs private scope decided (affects naming + license)
-- [ ] `examples/` directory with at least `minimal` and `complete`
+- [ ] `examples/` contains runnable minimal and complete OpenTofu usage plus Terragrunt usage; update all examples when inputs, outputs, source, or runtime requirements change
 - [ ] Tests written (native `terraform test` on 1.6+, or Terratest) — see [testing-frameworks.md](testing-frameworks.md)
 - [ ] README documents all inputs/outputs (Description → Usage → Inputs → Outputs → Requirements)
 - [ ] Module source pinned with `version` in consumer code

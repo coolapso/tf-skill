@@ -235,6 +235,8 @@ Look for agent:
 **Baseline → Compliance Changes:**
 - Agent NOW provides complete structure with examples/ and tests/
 - Agent explains purpose of each component
+- Agent includes runnable OpenTofu and Terragrunt usage examples
+- Agent updates examples with module-contract changes
 - Agent notes examples/ dual purpose (docs + fixtures)
 
 ### Success Criteria Verification
@@ -243,6 +245,8 @@ Look for agent:
 - [ ] Mentions examples/ directory
 - [ ] Mentions tests/ directory
 - [ ] Explains versions.tf
+- [ ] Includes OpenTofu and Terragrunt usage examples
+- [ ] Keeps examples current with module-contract changes
 - [ ] Notes examples as docs + fixtures
 
 ---
