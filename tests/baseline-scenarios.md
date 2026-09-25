@@ -290,11 +290,15 @@ I want to create a reusable Terraform module. What structure should I use?
   ├── outputs.tf
   ├── versions.tf
   ├── examples/
-  │   ├── minimal/
-  │   └── complete/
+  │   ├── tofu/
+  │   │   ├── minimal/
+  │   │   └── complete/
+  │   └── terragrunt/
   └── tests/
   ```
 - Explains purpose of each component
+- Includes runnable OpenTofu and Terragrunt usage examples
+- Updates examples when the module contract changes
 - Notes that examples/ serves dual purpose (docs + test fixtures)
 
 ### Success Criteria
@@ -302,6 +306,8 @@ I want to create a reusable Terraform module. What structure should I use?
 - [ ] Mentions examples/ directory
 - [ ] Mentions tests/ directory
 - [ ] Explains versions.tf for provider constraints
+- [ ] Includes OpenTofu and Terragrunt usage examples
+- [ ] Keeps examples current with module-contract changes
 - [ ] Notes examples serve as documentation AND test fixtures
 
 ---
